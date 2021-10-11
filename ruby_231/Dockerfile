@@ -6,11 +6,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends bzr git mercuri
 ENV DEBIAN_FRONTEND noninteractive
 RUN echo 'deb http://security.ubuntu.com/ubuntu bionic-security main' >> /etc/apt/sources.list
 RUN apt-get update && apt-cache policy libssl1.0-dev && \
-    apt-get install -y --no-install-recommends autoconf automake bzip2 file g++ gcc imagemagick libbz2-dev libc6-dev libcurl4-openssl-dev libdb-dev libevent-dev libffi-dev libgdbm-dev libgeoip-dev libglib2.0-dev libjpeg-dev libkrb5-dev liblzma-dev libmagickcore-dev libmagickwand-dev libmysqlclient-dev libncurses-dev libpng-dev libpq-dev libreadline-dev libsqlite3-dev libssl-dev libtool libwebp-dev libxml2-dev libxslt-dev libyaml-dev make patch xz-utils zlib1g-dev libssl1.0-dev software-properties-common && \
+    apt-get install -y --no-install-recommends autoconf automake bzip2 file g++ gcc imagemagick libbz2-dev libc6-dev libcurl4-openssl-dev libdb-dev libevent-dev libffi-dev libgdbm-dev libgeoip-dev libglib2.0-dev libjpeg-dev libkrb5-dev liblzma-dev libmagickcore-dev libmagickwand-dev libmysqlclient-dev libncurses-dev libpng-dev libpq-dev libreadline-dev libsqlite3-dev libssl-dev libtool libwebp-dev libxml2-dev libxslt-dev libyaml-dev make patch xz-utils zlib1g-dev software-properties-common && \
      rm -rf /var/lib/apt/lists/*
 
 # Ruby 231 needs the 1.0 openssl while ubuntu 20 use openssl 1.1
-RUN apt-cache policy libssl1.0-dev && apt-install libssl-dev=1.0.2n-1ubuntu5.7 && rm -rf /var/lib/apt/lists/*
+#RUN apt-cache policy libssl1.0-dev && apt-install libssl-dev=1.0.2n-1ubuntu5.7 && rm -rf /var/lib/apt/lists/*
 
 # Install RVM
 RUN apt-add-repository -y ppa:rael-gc/rvm && \
