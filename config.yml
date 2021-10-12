@@ -1,0 +1,11 @@
+version: 2
+# root keys are branch name and target is where the Dockerfile is located
+"ruby-231/ubuntu2004":
+  target: "ruby_231/ubuntu2004"
+  ruby_version: ruby-231
+  os_version: ubuntu-2004
+  ruby_manager: rvm
+  tags:
+    - ruby_version
+    - os_version
+    - ruby_manager
