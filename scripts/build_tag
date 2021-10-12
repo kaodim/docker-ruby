@@ -1,0 +1,76 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require_relative './util'
+require 'optparse'
+
+Options = {}
+parser = OptParse.new do |opt|
+  opt.on('-c', '--check', 'Validate the branch config') do |val|
+    Options[:check] = val
+  end
+
+  opt.on('-a', '--all', 'Perform action on all branches in the config') do |val|
+    Options[:all] = val
+  end
+end
+
+parser.parse! ARGV
+branch = ARGV[0]
+
+Config = YAML.load_file('config.yml').freeze
+TAG_DELIMITER = '_'.freeze
+
+def info(msg = '')
+  puts msg if Options[:check]
+end
+
+def build_tag(branch_name, _args = {})
+  branch = branch_name.gsub(/^(masters|test)\//, '')
+
+  # @type [Hash]
+  branch_config = Config[branch]
+
+  info "\nBranch config for #{branch}"
+  info "-------------"
+  info branch_config
+
+  raise 'Branch build config not found' unless Util.present?(branch_config)
+  raise 'Branch build target not found' unless Util.present?(branch_config['target'])
+
+  # check tags
+  # @type [Array]
+  tags = branch_config['tags']
+  required_tags = ['ruby_version', 'os_version'].freeze
+
+  # Tags presence
+  raise 'No tags are configured!' if Util.blank?(tags)
+
+  # check required tags presence
+  required_tags.each do |tag|
+    raise "Required tag '#{tag}' is missing" unless tags.include? tag
+  end
+
+  # check tags value presence
+  joined_tag = tags.each_with_object([]) do |tag, memo|
+    raise "#{tag} is configured but the value is empty!" if Util.blank? branch_config[tag]
+    memo << branch_config[tag]
+  end.join(TAG_DELIMITER)
+
+  info "\nFinalised tag:"
+  info '--------------'
+  puts joined_tag
+  joined_tag
+end
+
+info "Checking branch config..."
+
+if Options[:all]
+  Config.keys.each do |br|
+    next if br == 'version'
+    build_tag(br, check: Options[:check])
+  end
+else
+  raise "Branch name must be given" if Util.blank?(branch)
+  build_tag branch
+end
