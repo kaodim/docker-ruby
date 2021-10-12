@@ -1,0 +1,51 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/project
+    docker:
+#      - image: docker:18.06.1-ce-git
+      - image: cimg/ruby:2.7.3
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Check branch build config
+          command: ./scripts/build_tag --check $CIRCLE_BRANCH
+      - run:
+          name: Setup custom environment variables
+          command: |
+            echo "export RUBY_REPO=${DOCKER_USERNAME}/docker-ruby" >> $BASH_ENV
+            echo "export BRANCH_ENV=$(echo $CIRCLE_BRANCH | grep -oE --color=never '^(masters|test)\/')" >> $BASH_ENV
+            echo "export FLAVOUR_TAG=$(./scripts/build_tag ${CIRCLE_BRANCH})" >> $BASH_ENV
+            echo "export DOCKERFILE_PATH=$(./scripts/build_docker_path ${CIRCLE_BRANCH})" >> $BASH_ENV
+            echo "export FORMATTED_CIRCLE_BRANCH=$(echo ${CIRCLE_BRANCH} | tr '/' '_')" >> $BASH_ENV
+      - run:
+          name: Build Docker image
+          command: |
+            source $BASH_ENV
+            docker build -t "$RUBY_REPO:${FORMATTED_CIRCLE_BRANCH}_build${CIRCLE_BUILD_NUM}" -t "$RUBY_REPO:${FLAVOUR_TAG}_build${CIRCLE_BUILD_NUM}" ./${DOCKERFILE_PATH}
+#      - run:
+#          name: Add sandbox tag
+#          command: |
+#            source $BASH_ENV
+#            if [ "$BRANCH_ENV" == "test/" ]
+#            then
+#              echo Adding sandbox tag...
+#              docker tag $RUBY_REPO:$CIRCLE_BUILD_NUM $RUBY_REPO:$CIRCLE_BUILD_NUM-sandbox
+#            fi
+      - deploy:
+          name: Push Docker image
+          command: |
+            source $BASH_ENV
+            echo Logging in Docker Hub...
+            echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+            docker push $RUBY_REPO:${FORMATTED_CIRCLE_BRANCH}_build${CIRCLE_BUILD_NUM}
+            docker push $RUBY_REPO:${FLAVOUR_TAG}_build${CIRCLE_BUILD_NUM}
+workflows:
+  version: 2.1
+  build-deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /^(masters|test)\/.*/
