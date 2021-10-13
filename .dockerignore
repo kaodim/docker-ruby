@@ -1,0 +1,10 @@
+.circleci
+.git
+.gitignore
+.dockerignore
+*/**/Dockerfile
+LICENSE
+tmp
+.idea
+/logs
+/log
