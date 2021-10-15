@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require_relative './util'
+require 'optparse'
+
+original_branch = ARGV[0]
+
+raise "Branch name must be given" if Util.blank?(original_branch)
+
+branch = original_branch.gsub(/^(masters|test)\//, '')
+config = YAML.load_file('config.yml')
+build_path = config.dig(branch, 'target')
+
+raise "Dockerfile not found for #{original_branch}" if Util.blank?(build_path)
+puts build_path
