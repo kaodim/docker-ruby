@@ -14,7 +14,7 @@ jobs:
       - run:
           name: Setup custom environment variables
           command: |
-            echo "export RUBY_REPO=${DOCKER_USERNAME}/docker-ruby" >> $BASH_ENV
+            echo "export RUBY_REPO=${DOCKER_USERNAME}/ruby" >> $BASH_ENV
             echo "export BRANCH_ENV=$(echo $CIRCLE_BRANCH | grep -oE --color=never '^(masters|test)\/')" >> $BASH_ENV
             echo "export FLAVOUR_TAG=$(./scripts/build_tag ${CIRCLE_BRANCH})" >> $BASH_ENV
             echo "export DOCKERFILE_PATH=$(./scripts/build_docker_path ${CIRCLE_BRANCH})" >> $BASH_ENV
