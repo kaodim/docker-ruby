@@ -18,3 +18,12 @@ version: 2
     - ruby_version
     - os_version
     - ruby_manager
+"ruby-259/ubuntu2004":
+  target: "ruby_259/ubuntu2004"
+  ruby_version: ruby-259
+  os_version: ubuntu-2004
+  ruby_manager: rvm
+  tags:
+    - ruby_version
+    - os_version
+    - ruby_manager
